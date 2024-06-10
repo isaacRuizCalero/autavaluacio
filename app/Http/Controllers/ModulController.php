@@ -1,65 +1,60 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Models\moduls;
+use App\Http\Controllers\Controller;
+use App\Models\Modul;
 use Illuminate\Http\Request;
 
-class ModulsController extends Controller
+class ModulController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return response()->json(Modul::all(), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'codi' => 'required|string|max:10',
+            'sigles' => 'required|string|max:10',
+            'nom' => 'required|string|max:45',
+            'actiu' => 'required|boolean',
+            'cicles_id' => 'required|exists:cicles,id',
+        ]);
+
+        $modul = Modul::create($request->all());
+
+        return response()->json($modul, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(moduls $moduls)
+    public function show($id)
     {
-        //
+        $modul = Modul::findOrFail($id);
+        return response()->json($modul, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(moduls $moduls)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'codi' => 'sometimes|required|string|max:10',
+            'sigles' => 'sometimes|required|string|max:10',
+            'nom' => 'sometimes|required|string|max:45',
+            'actiu' => 'sometimes|required|boolean',
+            'cicles_id' => 'sometimes|required|exists:cicles,id',
+        ]);
+
+        $modul = Modul::findOrFail($id);
+        $modul->update($request->all());
+
+        return response()->json($modul, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, moduls $moduls)
+    public function destroy($id)
     {
-        //
-    }
+        $modul = Modul::findOrFail($id);
+        $modul->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(moduls $moduls)
-    {
-        //
+        return response()->json(null, 204);
     }
 }
